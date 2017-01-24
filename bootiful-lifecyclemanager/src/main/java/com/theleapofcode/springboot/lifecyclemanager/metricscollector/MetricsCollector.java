@@ -1,10 +1,9 @@
 package com.theleapofcode.springboot.lifecyclemanager.metricscollector;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cloud.client.discovery.DiscoveryClient;
-import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
@@ -16,9 +15,6 @@ import com.theleapofcode.springboot.lifecyclemanager.decisionengine.DecisionEngi
 public class MetricsCollector {
 
 	@Autowired
-	private DiscoveryClient eurekaClient;
-
-	@Autowired
 	private DecisionEngine decisionEngine;
 
 	@Autowired
@@ -26,11 +22,13 @@ public class MetricsCollector {
 
 	public void start() {
 		while (true) {
-			eurekaClient.getServices().forEach(service -> {
-				System.out.println("printing service " + service);
-				Map metrics = restTemplate.getForObject("http://" + service + "/metrics", Map.class);
-				decisionEngine.execute(service, metrics);
-			});
+			Map metrics = restTemplate.getForObject("http://localhost:8090/metrics", Map.class);
+			decisionEngine.execute("ping", metrics);
+			try {
+				TimeUnit.SECONDS.sleep(5);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }
@@ -38,7 +36,6 @@ public class MetricsCollector {
 @Configuration
 class AppConfiguration {
 
-	@LoadBalanced
 	@Bean
 	RestTemplate restTemplate() {
 		return new RestTemplate();

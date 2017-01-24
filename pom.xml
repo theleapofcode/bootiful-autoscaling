@@ -10,10 +10,7 @@
   <packaging>pom</packaging>
 
   <modules>
-    <module>bootiful-configserver</module>
-    <module>bootiful-eurekaserver</module>
-    <module>bootiful-apigateway</module>
-    <module>bootiful-search</module>
+    <module>bootiful-ping-service</module>
     <module>bootiful-lifecyclemanager</module>
   </modules>
 </project>
